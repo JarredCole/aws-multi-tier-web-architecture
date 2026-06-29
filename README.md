@@ -68,7 +68,7 @@ Local Loopback Isolation: Using AWS Systems Manager (SSM) to access the instance
 
 Isolating the Error: The terminal returned an HTTP/1.1 403 Forbidden status code. This proved that Apache was awake and listening, but rejecting requests because the default /var/www/html/ directory was empty, causing Apache to deny directory listing.
 
-The Fix: I injected a valid landing page onto the server using echo ("<h1>Hello World</h1>") | sudo tee /var/www/html/index.html.
+The Fix: I injected a valid landing page onto the server using echo "<h1>Hello World</h1>" | sudo tee /var/www/html/index.html.
 
 ALB Alignment: I re-ran the curl test to verify a successful 200 OK response. 
 
