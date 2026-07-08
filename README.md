@@ -44,7 +44,7 @@ This architecture was explicitly engineered to simulate a real-world corporate m
 
 | Architecture Graph | Multi-AZ Terraform Apply | Target Group Health Checks |
 | :---: | :---: | :---: |
-| ![Architecture Graph](screenshots/clean-graph.png) | ![Multi-AZ Apply](screenshots/6-terraform-multiaz-apply-success.png) | ![Target Group Healthy](screenshots/4-target-group-healthy.png) |
+| ![Architecture Graph](screenshots/clean-graph.png) | ![Multi-AZ Apply](screenshots/6-terraform-multiaz-apply-success.png) | ![Target Group Healthy](screenshots/8-terraform-multiaz-tg-healthy.png) |
 
 ---
 
