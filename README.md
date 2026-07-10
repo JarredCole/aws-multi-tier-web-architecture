@@ -57,7 +57,7 @@ This architecture was explicitly engineered to simulate a real-world corporate m
 ### Phase 3: GitHub Actions CI/CD Pipeline Automation
 | Secure OIDC AWS Auth | Pipeline Execution Success | State Synchronization (No Changes) |
 | :---: | :---: | :---: |
-| ![OIDC Secure Auth](./screenshots/oidc-auth.png) | ![Pipeline Success](./screenshots/pipeline-success.png) | ![Terraform State Alignment](./screenshots/terraform-output.png) |
+| ![OIDC Secure Auth](./screenshots/2-cicd-pipline-jobs-aws-cred-config.png) | ![Pipeline Success](./screenshots/1-cicd-all-workflows.png) | ![Terraform State Alignment](./screenshots/3-cicd-pipeline-tfapply-nochanges.png) |
 
 ---
 
