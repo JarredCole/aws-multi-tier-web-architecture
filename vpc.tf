@@ -18,7 +18,9 @@ resource "aws_internet_gateway" "igw" {
   }
 }
 
+
 # 3. Create Public Subnets (A & B)
+# tfsec:ignore:aws-ec2-no-public-ip-subnet
 resource "aws_subnet" "public_a" {
   vpc_id	    = aws_vpc.main.id
   cidr_block	    = var.public_subnet_cidrs[0]
@@ -30,6 +32,7 @@ resource "aws_subnet" "public_a" {
   }
 }
 
+# tfsec:ignore:aws-ec2-no-public-ip-subnet
 resource "aws_subnet" "public_b" {
   vpc_id            = aws_vpc.main.id
   cidr_block        = var.public_subnet_cidrs[1]

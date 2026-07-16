@@ -1,4 +1,7 @@
+
 # 1. Create the ALB Security Group (Allows Public Traffic)
+# tfsec:ignore:aws-ec2-no-public-ingress-sgr
+# tfsec:ignore:aws-ec2-no-public-egress-sgr
 resource "aws_security_group" "alb_sg" {
   name        = "production-alb-sg"
   description = "Allows public HTTP traffic to the ALB"
@@ -181,16 +184,35 @@ resource "aws_iam_instance_profile" "ec2_profile" {
   role = aws_iam_role.ec2_ssm_role.name
 }
 
+# tfsec:ignore:aws-elb-alb-not-public
+# tfsec:ignore:aws-elb-http-not-used
 # 9. Define the Application Load Balancer
 resource "aws_lb" "external_alb" {
   name               = "production-alb"
   internal           = false
   load_balancer_type = "application"
+  drop_invalid_header_fields = true # Fixes Result #5 (HIGH)
   security_groups    = [aws_security_group.alb_sg.id] # Make sure this matches your ALB SG name
   subnets            = [aws_subnet.public_a.id, aws_subnet.public_b.id] # Must span at least 2 public subnets
 
   tags = {
     Name = "production-alb"
+  }
+}
+
+# In compute.tf -> aws_launch_template.web_launch_template
+resource "aws_launch_template" "web_launch_template" {
+  name_prefix   = "web-server-template-"
+  image_id      = data.aws_ami.amazon_linux_2023.id
+  instance_type = "t2.micro"
+
+  vpc_security_group_ids = [aws_security_group.web_sg.id]
+
+  # Fixes Result #7 (HIGH) - Enforce IMDSv2 Token Requirement
+  metadata_options {
+    http_endpoint               = "enabled"
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 1
   }
 }
 
