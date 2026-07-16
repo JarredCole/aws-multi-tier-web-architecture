@@ -126,6 +126,13 @@ resource "aws_launch_template" "web_launch_template" {
   lifecycle {
     create_before_destroy = true
   }
+
+    # Fixes Result #7 (HIGH) - Enforce IMDSv2 Token Requirement
+  metadata_options {
+    http_endpoint               = "enabled"
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 1
+  }
 }
 
 # 5. Define the Auto Scaling Group (The Engine)
@@ -201,21 +208,9 @@ resource "aws_lb" "external_alb" {
   }
 }
 
-# In compute.tf -> aws_launch_template.web_launch_template
-resource "aws_launch_template" "web_launch_template" {
-  name_prefix   = "web-server-template-"
-  image_id      = data.aws_ami.amazon_linux_2023.id
-  instance_type = "t2.micro"
 
-  vpc_security_group_ids = [aws_security_group.web_sg.id]
 
-  # Fixes Result #7 (HIGH) - Enforce IMDSv2 Token Requirement
-  metadata_options {
-    http_endpoint               = "enabled"
-    http_tokens                 = "required"
-    http_put_response_hop_limit = 1
-  }
-}
+
 
 # 10. Define the Target Group
 resource "aws_lb_target_group" "web_target_group" {
