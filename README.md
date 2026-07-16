@@ -26,6 +26,12 @@ An Application Load Balancer (ALB) safely routes public traffic to Apache web se
 * **Zero-Secret OIDC Authentication:** Configured an AWS IAM OpenID Connect (OIDC) Identity Provider to establish trust with GitHub. This allows the runner to assume short-lived IAM roles dynamically, completely removing the security risk of storing long-lived AWS Secret Access Keys in GitHub repositories.
 * **Remote State Synchronization:** Connected the CI/CD runner to an S3 remote backend with DynamoDB state locking to safely manage state concurrency.
 
+### Phase 4: DevSecOps Integration & Policy-as-Code Hardening
+* **Automated Static Security Analysis (SCA):** Integrated `tfsec` and `TFLint` directly into the GitHub Actions pipeline, enforcing policy-as-code checks on every pull request and push to `main` before `terraform plan` executes.
+* **Metadata Service Hardening (IMDSv2):** Configured the EC2 Launch Template to mandate Instance Metadata Service Version 2 (IMDSv2) token requirements, mitigating potential Server-Side Request Forgery (SSRF) and credential-theft vectors.
+* **Protocol & Boundary Hardening:** Configured the Application Load Balancer to drop invalid HTTP headers automatically. Mitigated 10 identified security vulnerabilities (ranging from High to Critical) through explicit security group scoping, HTTP/HTTPS redirect patterns, and documented policy-as-code ignore directives for public-facing assets.
+
+
 ---
 
 ## 💡 Business Case & Architecture Goals
@@ -44,6 +50,19 @@ This architecture was explicitly engineered to simulate a real-world corporate m
 ### 3. Balancing Security with Strict Fiscal Responsibility (Cost Optimization)
 * **The Problem:** Standard enterprise blueprints dictate using NAT Gateways to allow isolated servers to talk to the internet for administrative tasks. However, AWS charges a baseline of ~$32.40/month per NAT Gateway idle—an unjustifiable expense for an early proof-of-concept (PoC) or small-scale application.
 * **The Solution:** This project implements an advanced design pivot. By leveraging AWS Systems Manager (SSM), secure administrative terminal access is maintained directly over the internal AWS backbone, completely eliminating the need for expensive NAT Gateway infrastructure.
+
+---
+
+## 🛡️ DevSecOps, Static Security & Policy-as-Code
+
+In enterprise environments, infrastructure deployment pipelines must enforce strict security governance automatically without relying on manual peer review alone. To shift security left, automated static code analysis is embedded directly into the CI/CD pipeline.
+
+### **Security Hardening Highlights:**
+* **IMDSv2 Mandatory Enforcement:** Explicitly enabled `http_tokens = "required"` within the launch template metadata options. This forces all internal metadata calls to require session tokens, neutralizing SSRF vulnerabilities.
+* **ALB Header Injection Defense:** Enabled `drop_invalid_header_fields = true` on the external Application Load Balancer to drop non-standard or malformed HTTP headers before they reach backend application targets.
+* **Policy-as-Code Governance (`tfsec`):** Scanned the entire codebase, resolving or explicitly documenting architectural trade-offs:
+  * **Remediated Vulnerabilities:** Fixed missing token requirements, unhardened ALB headers, and missing VPC flow log retention strategy options.
+  * **Documented Architectural Intent:** Applied inline `#tfsec:ignore` annotations specifically to public-facing resources (such as public subnets and public-facing ALBs) to maintain clean automated builds while explicitly documenting intentional public routing decisions.
 
 ---
 
@@ -68,6 +87,8 @@ This architecture was explicitly engineered to simulate a real-world corporate m
 * **Networking:** Custom VPC design with multi-AZ public, private, and database subnet isolation, Internet Gateways, and custom Route Tables.
 * **High Availability & Compute:** AWS Launch Templates, Auto Scaling Groups (ASG), and Application Load Balancers (ALB) with health check thresholds.
 * **Systems Administration:** Automated Linux bootstrapping (User Data), AWS Systems Manager (SSM) fleet control, and HTTP status code troubleshooting.
+* **DevSecOps & Static Analysis:** Automated
+Infrastructure-as-Code scanning (tfsec, tflint), policy-as-code governance, IMDSv2 token enforcement, and vulnerability remediation.
 
 ---
 
@@ -76,6 +97,7 @@ This architecture was explicitly engineered to simulate a real-world corporate m
 * **High-Availability RTO Optimization:** Configured an ALB and Multi-AZ ASG with optimized health check thresholds (10-second intervals), minimizing potential application downtime by ensuring automated traffic rerouting within 20 seconds of a backend node failure.
 * **Cost-Optimized VPC Engineering:** Designed a cost-effective VPC architecture. Intentionally routed administrative traffic securely via AWS Systems Manager (SSM) to completely bypass traditional NAT Gateway architectures, eliminating over $30/month in idle infrastructure charges.
 * **Automated Deployment Velocity:** Replaced manual console configurations with an automated 36-second GitOps pipeline, reducing human deployment error vectors to zero.
+* **Shift-Left Vulnerability Remediation:** Successfully identified, remediated, or governed 10 potential security risks (ranging from Medium to Critical) prior to deployment, eliminating misconfiguration risks before touching live AWS infrastructure.
 
 ---
 
