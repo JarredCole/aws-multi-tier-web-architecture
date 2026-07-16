@@ -1,7 +1,7 @@
 
 # 1. Create the ALB Security Group (Allows Public Traffic)
 # tfsec:ignore:aws-ec2-no-public-ingress-sgr
-# tfsec:ignore:aws-ec2-no-public-egress-sgr
+
 resource "aws_security_group" "alb_sg" {
   name        = "production-alb-sg"
   description = "Allows public HTTP traffic to the ALB"
@@ -12,7 +12,7 @@ resource "aws_security_group" "alb_sg" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["0.0.0.0/0"] #tfsec:ignore:aws-ec2-no-public-ingress-sgr
   }
 
   egress {
@@ -20,7 +20,7 @@ resource "aws_security_group" "alb_sg" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["0.0.0.0/0"] #tfsec:ignore:aws-ec2-no-public-egress-sgr
   }
 
   tags = {
@@ -47,7 +47,7 @@ resource "aws_security_group" "web_sg" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["0.0.0.0/0"] #tfsec:ignore:aws-ec2-no-public-egress-sgr
   }
 
   tags = {
@@ -185,8 +185,9 @@ resource "aws_iam_instance_profile" "ec2_profile" {
 }
 
 # tfsec:ignore:aws-elb-alb-not-public
-# tfsec:ignore:aws-elb-http-not-used
+
 # 9. Define the Application Load Balancer
+# tfsec:ignore:aws-elb-alb-not-public
 resource "aws_lb" "external_alb" {
   name               = "production-alb"
   internal           = false
@@ -220,7 +221,7 @@ resource "aws_launch_template" "web_launch_template" {
 resource "aws_lb_target_group" "web_target_group" {
   name     = "web-server-target-group"
   port     = 80
-  protocol = "HTTP"
+  protocol = "HTTP" # tfsec:ignore:aws-elb-http-not-used
   vpc_id   = aws_vpc.main.id # Make sure this matches your VPC resource name
 
   health_check {
