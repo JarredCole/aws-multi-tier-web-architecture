@@ -28,22 +28,39 @@ jobs:
         with:
           terraform_version: 1.5.0 # Matches your project runtime
 
-      # Step 3: Securely authenticate with AWS using keyless OIDC
+      # Step 3: Lint Terraform code for syntax and best practice standards
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: v0.50.0
+
+      - name: Run TFLint
+        run: |
+          tflint --init
+          tflint -f compact
+
+      # Step 4: DevSecOps static security analysis scan
+      - name: Run tfsec Security Scan
+        uses: aquasecurity/tfsec-action@v1.0.0
+        with:
+          soft_fail: true # Set to false if you want failed security checks to block the build!
+
+      # Step 5: Securely authenticate with AWS using keyless OIDC
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::533267018151:role/github-actions-terraform-role
           aws-region: us-east-1
 
-      # Step 4: Initialize Terraform backend using the S3 configuration
+      # Step 6: Initialize Terraform backend using the S3 configuration
       - name: Terraform Init
         run: terraform init
 
-      # Step 5: Always run a dry-run Plan on both Pull Requests and Pushes
+      # Step 7: Always run a dry-run Plan on both Pull Requests and Pushes
       - name: Terraform Plan
         run: terraform plan
 
-      # Step 6: Automatically deploy ONLY when changes are merged directly into main
+      # Step 8: Automatically deploy ONLY when changes are merged directly into main
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: terraform apply -auto-approve
