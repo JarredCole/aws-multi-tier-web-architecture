@@ -92,6 +92,10 @@ In enterprise environments, infrastructure deployment pipelines must enforce str
 | :---: |
 | ![CloudWatch Graph](./screenshots/phase-5-monitoring/1-cloudwatch-graph.png) |
 
+### 🚀 Next Milestone: Containerization & Microservices
+- [ ] Containerize the application using Docker and multi-stage builds.
+- [ ] Set up AWS ECR (Elastic Container Registry) for container image lifecycle management.
+- [ ] Migrate compute workloads to AWS ECS (Elastic Container Service) / Fargate.
 
 ---
 
