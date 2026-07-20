@@ -31,6 +31,10 @@ An Application Load Balancer (ALB) safely routes public traffic to Apache web se
 * **Metadata Service Hardening (IMDSv2):** Configured the EC2 Launch Template to mandate Instance Metadata Service Version 2 (IMDSv2) token requirements, mitigating potential Server-Side Request Forgery (SSRF) and credential-theft vectors.
 * **Protocol & Boundary Hardening:** Configured the Application Load Balancer to drop invalid HTTP headers automatically. Mitigated 10 identified security vulnerabilities (ranging from High to Critical) through explicit security group scoping, HTTP/HTTPS redirect patterns, and documented policy-as-code ignore directives for public-facing assets.
 
+### Phase 5: Observability & Automated Alerting
+- **Infrastructure Health Dashboards:** Provisioned custom CloudWatch Dashboards in Terraform (`monitoring.tf`) tracking ASG CPU utilization, ALB request volume, and HTTP 5xx error rates.
+- **Proactive Incident Alerting:** Automated CloudWatch Metric Alarms linked to AWS Simple Notification Service (SNS) to deliver immediate email alerts for high resource utilization or upstream web server degradation.
+- **Infrastructure-as-Code Observability:** Ensured all monitoring assets, metrics, and alerting thresholds are fully version-controlled and deployed via automated CI/CD pipelines.
 
 ---
 
@@ -71,12 +75,23 @@ In enterprise environments, infrastructure deployment pipelines must enforce str
 ### Phase 1 & 2: Infrastructure Layout & AWS State
 | Architecture Diagram | Multi-AZ Terraform Apply | Target Group Health Checks |
 | :---: | :---: | :---: |
-| ![Architecture Diagram](./screenshots/projectdiagram.png) | ![Multi-AZ Apply](screenshots/6-terraform-multiaz-apply-success.png) | ![Target Group Healthy](screenshots/8-terraform-multiaz-tg-healthy.png) |
+| ![Architecture Diagram](./screenshots/0-architecture/projectdiagram.png) | ![Multi-AZ Apply](screenshots/phase-2-multiaz-iac/6-terraform-multiaz-apply-success.png) | ![Target Group Healthy](screenshots/phase-2-multiaz-iac/8-terraform-multiaz-tg-healthy.png) |
 
 ### Phase 3: GitHub Actions CI/CD Pipeline Automation
 | Secure OIDC AWS Auth | Pipeline Execution Success | State Synchronization (No Changes) |
 | :---: | :---: | :---: |
-| ![OIDC Secure Auth](./screenshots/2-cicd-pipline-jobs-aws-cred-config.png) | ![Pipeline Success](./screenshots/1-cicd-all-workflows.png) | ![Terraform State Alignment](./screenshots/3-cicd-pipeline-tfapply-nochanges.png) |
+| ![OIDC Secure Auth](./screenshots/phase-3-cicd/2-cicd-pipline-jobs-aws-cred-config.png) | ![Pipeline Success](./screenshots/phase-3-cicd/1-cicd-all-workflows.png) | ![Terraform State Alignment](./screenshots/phase-3-cicd/3-cicd-pipeline-tfapply-nochanges.png) |
+
+### Phase 4: DevSecOps Integration & Policy-as-Code Hardening
+| tfsec Security Scan |
+| :---: |
+| ![tfsec Scan success](./screenshots/phase-4-devsecops/1-tfsec-success.png) |
+
+### Phase 5: Observability & Automated Alerting
+| Custom CloudWatch Widget |
+| :---: |
+| ![CloudWatch Graph](./screenshots/phase-5-monitoring/1-cloudwatch-graph.png) |
+
 
 ---
 
